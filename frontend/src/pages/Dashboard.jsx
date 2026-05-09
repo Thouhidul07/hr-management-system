@@ -1,120 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { Card } from '../components/Card';
-import { employeesAPI, attendanceAPI } from '../services/api';
+import React from 'react';
+import { FaUsers, FaCheckCircle, FaCalendarAlt, FaClock } from 'react-icons/fa';
+import KPICard from '../components/KPICard';
+import ChartComponent from '../components/Chart';
+import PageCard from '../components/PageCard';
+import Badge from '../components/Badge';
 import '../styles/Dashboard.css';
 
+const dashboardStats = [
+  { title: 'Total Employees', value: '1,234', change: '+12%', trend: 'up', color: 'primary', icon: FaUsers },
+  { title: 'Present Today', value: '1,156', change: '+2%', trend: 'up', color: 'success', icon: FaCheckCircle },
+  { title: 'On Leave', value: '48', change: '-5%', trend: 'down', color: 'warning', icon: FaCalendarAlt },
+  { title: 'Avg. Work Hours', value: '8.2', change: '+0.5', trend: 'up', color: 'info', icon: FaClock },
+];
+
+const attendanceTrend = [
+  { month: 'Jan', present: 1100 },
+  { month: 'Feb', present: 1120 },
+  { month: 'Mar', present: 1140 },
+  { month: 'Apr', present: 1156 },
+  { month: 'May', present: 1180 },
+  { month: 'Jun', present: 1200 },
+];
+
+const departmentData = [
+  { name: 'Engineering', value: 450 },
+  { name: 'Sales', value: 280 },
+  { name: 'Marketing', value: 180 },
+  { name: 'HR', value: 120 },
+  { name: 'Finance', value: 204 },
+];
+
+const recentActivity = [
+  { id: 1, title: 'John Doe submitted leave request', meta: '5 min ago' },
+  { id: 2, title: 'Sarah Smith completed onboarding', meta: '15 min ago' },
+  { id: 3, title: 'Mike Johnson submitted expense claim', meta: '1 hour ago' },
+  { id: 4, title: 'Emily Brown enrolled in training course', meta: '2 hours ago' },
+  { id: 5, title: 'David Wilson updated profile information', meta: '3 hours ago' },
+];
+
+const upcomingEvents = [
+  { id: 1, title: 'Payroll Processing', date: 'Apr 5, 2026', tag: 'payroll' },
+  { id: 2, title: 'New Hire Orientation', date: 'Apr 7, 2026', tag: 'onboarding' },
+  { id: 3, title: 'Performance Reviews Due', date: 'Apr 10, 2026', tag: 'performance' },
+  { id: 4, title: 'Training Workshop', date: 'Apr 15, 2026', tag: 'training' },
+];
+
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    totalEmployees: 0,
-    presentToday: 0,
-    absentToday: 0,
-    pendingTasks: 0,
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch employee stats
-        const employeeStats = await employeesAPI.getStats();
-        
-        // Fetch attendance stats for today
-        const today = new Date().toISOString().split('T')[0];
-        const attendanceResponse = await attendanceAPI.getAll({
-          date: today,
-          limit: 1000,
-        });
-        
-        const attendanceRecords = attendanceResponse.data;
-        const presentCount = attendanceRecords.filter(
-          record => record.status === 'Present'
-        ).length;
-        const absentCount = attendanceRecords.filter(
-          record => record.status === 'Absent'
-        ).length;
-        
-        setStats({
-          totalEmployees: employeeStats.data.totalEmployees || 0,
-          presentToday: presentCount,
-          absentToday: absentCount,
-          pendingTasks: 0, // This would need to be fetched from onboarding API
-        });
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
-
-  const cards = [
-    {
-      title: 'Total Employees',
-      value: stats.totalEmployees,
-      icon: '👥',
-      color: 'primary',
-    },
-    {
-      title: 'Present Today',
-      value: stats.presentToday,
-      icon: '✅',
-      color: 'success',
-    },
-    {
-      title: 'Absent Today',
-      value: stats.absentToday,
-      icon: '❌',
-      color: 'danger',
-    },
-    {
-      title: 'Pending Tasks',
-      value: stats.pendingTasks,
-      icon: '📋',
-      color: 'warning',
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div className="dashboard-loading">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="dashboard">
-      <h1 className="dashboard-title">Dashboard</h1>
-      
-      <div className="dashboard-cards">
-        {cards.map((card, index) => (
-          <Card key={index} title={card.title}>
-            <div className="card-content">
-              <div className="card-icon">{card.icon}</div>
-              <div className="card-value">{card.value}</div>
-            </div>
-          </Card>
+    <div className="dashboard-page">
+      <div className="page-header dashboard-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back! Here&apos;s what&apos;s happening today.</p>
+        </div>
+        <button className="btn btn-primary dashboard-action-btn">Generate Report</button>
+      </div>
+
+      <div className="dashboard-kpi-grid">
+        {dashboardStats.map((stat) => (
+          <KPICard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            change={stat.change}
+            trend={stat.trend}
+            color={stat.color}
+            icon={stat.icon}
+          />
         ))}
       </div>
 
-      <div className="dashboard-charts">
-        <Card title="Recent Activity">
-          <div className="activity-placeholder">
-            <p>Recent activity will be displayed here.</p>
+      <div className="dashboard-grid">
+        <PageCard title="Attendance Trend" className="dashboard-panel dashboard-panel-wide">
+          <ChartComponent
+            type="line"
+            data={attendanceTrend}
+            dataKey="month"
+            lines={[{ dataKey: 'present' }]}
+          />
+        </PageCard>
+
+        <PageCard title="Department Distribution" className="dashboard-panel">
+          <div className="dashboard-donut-wrap">
+            <ChartComponent type="donut" data={departmentData} dataKey="value" />
+            <div className="dashboard-department-legend">
+              {departmentData.map((department) => (
+                <div key={department.name} className="legend-row">
+                  <span className="legend-dot" />
+                  <span>{department.name}</span>
+                  <strong>{department.value}</strong>
+                </div>
+              ))}
+            </div>
           </div>
-        </Card>
-        
-        <Card title="Upcoming Tasks">
-          <div className="tasks-placeholder">
-            <p>Upcoming tasks will be displayed here.</p>
+        </PageCard>
+      </div>
+
+      <div className="dashboard-grid dashboard-grid-bottom">
+        <PageCard title="Recent Activity" className="dashboard-panel">
+          <div className="dashboard-list">
+            {recentActivity.map((activity) => (
+              <div key={activity.id} className="dashboard-list-item">
+                <div className="dashboard-list-bullet" />
+                <div>
+                  <h4>{activity.title}</h4>
+                  <p>{activity.meta}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        </Card>
+        </PageCard>
+
+        <PageCard title="Upcoming Events" className="dashboard-panel">
+          <div className="dashboard-events">
+            {upcomingEvents.map((event) => (
+              <div key={event.id} className="dashboard-event-row">
+                <div>
+                  <h4>{event.title}</h4>
+                  <p>{event.date}</p>
+                </div>
+                <Badge label={event.tag} variant="secondary" size="sm" />
+              </div>
+            ))}
+          </div>
+        </PageCard>
       </div>
     </div>
   );

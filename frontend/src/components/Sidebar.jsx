@@ -1,6 +1,18 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaUserPlus,
+  FaClock,
+  FaUmbrellaBeach,
+  FaGraduationCap,
+  FaMoneyBillWave,
+  FaFileInvoiceDollar,
+  FaChartLine,
+  FaShieldAlt,
+} from 'react-icons/fa';
 import '../styles/Sidebar.css';
 
 const Sidebar = () => {
@@ -15,17 +27,22 @@ const Sidebar = () => {
   // Define navigation items based on user role
   const getNavItems = () => {
     const baseItems = [
-      { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+      { path: '/dashboard', label: 'Dashboard', icon: FaTachometerAlt },
     ];
 
     // Admin and HR can access all features
     if (hasRole('Admin') || hasRole('HR')) {
       return [
         ...baseItems,
-        { path: '/employees', label: 'Employees', icon: '👥' },
-        { path: '/attendance', label: 'Attendance', icon: '📅' },
-        { path: '/onboarding', label: 'Onboarding', icon: '🚀' },
-        { path: '/leave', label: 'Leave', icon: '🏖️' },
+        { path: '/employees', label: 'Employees', icon: FaUsers },
+        { path: '/attendance', label: 'Attendance', icon: FaClock },
+        { path: '/onboarding', label: 'Onboarding', icon: FaUserPlus },
+        { path: '/leave', label: 'Leave', icon: FaUmbrellaBeach },
+        { path: '/training', label: 'Training', icon: FaGraduationCap },
+        { path: '/payroll', label: 'Payroll', icon: FaMoneyBillWave },
+        { path: '/expense', label: 'Expense', icon: FaFileInvoiceDollar },
+        { path: '/performance', label: 'Performance', icon: FaChartLine },
+        { path: '/roles', label: 'Roles & Permissions', icon: FaShieldAlt },
       ];
     }
 
@@ -33,9 +50,11 @@ const Sidebar = () => {
     if (hasRole('Manager')) {
       return [
         ...baseItems,
-        { path: '/employees', label: 'Employees', icon: '👥' },
-        { path: '/attendance', label: 'Attendance', icon: '📅' },
-        { path: '/onboarding', label: 'Onboarding', icon: '🚀' },
+        { path: '/employees', label: 'Employees', icon: FaUsers },
+        { path: '/attendance', label: 'Attendance', icon: FaClock },
+        { path: '/onboarding', label: 'Onboarding', icon: FaUserPlus },
+        { path: '/training', label: 'Training', icon: FaGraduationCap },
+        { path: '/performance', label: 'Performance', icon: FaChartLine },
       ];
     }
 
@@ -43,7 +62,8 @@ const Sidebar = () => {
     if (hasRole('Employee')) {
       return [
         ...baseItems,
-        { path: '/attendance', label: 'My Attendance', icon: '📅' },
+        { path: '/attendance', label: 'My Attendance', icon: FaClock },
+        { path: '/training', label: 'Training', icon: FaGraduationCap },
       ];
     }
 
@@ -55,8 +75,11 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>HRMS</h2>
-        <span>Human Resource Management</span>
+        <div className="sidebar-brand-mark">HRMS</div>
+        <div className="sidebar-brand-copy">
+          <h2>HRMS</h2>
+          <span>Human Resource Management</span>
+        </div>
       </div>
       
       <nav className="sidebar-nav">
@@ -66,7 +89,7 @@ const Sidebar = () => {
             className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
             onClick={() => navigate(item.path)}
           >
-            <span className="nav-icon">{item.icon}</span>
+            <span className="nav-icon"><item.icon /></span>
             <span className="nav-label">{item.label}</span>
           </button>
         ))}
@@ -79,7 +102,7 @@ const Sidebar = () => {
           </div>
           <div className="user-details">
             <div className="user-name">{user?.firstName} {user?.lastName}</div>
-            <div className="user-role">{user?.role}</div>
+            <div className="user-role">{String(user?.role || '').replace(/_/g, ' ').toLowerCase()}</div>
           </div>
         </div>
       </div>

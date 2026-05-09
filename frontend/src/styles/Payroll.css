@@ -1,0 +1,56 @@
+/* Payroll Page Styles */
+.payroll-page {
+  padding: 30px;
+  background-color: #f5f7fa;
+}
+
+.salary-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.breakdown-section {
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.breakdown-section h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  color: #666;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.breakdown-row:last-child {
+  border-bottom: none;
+}
+
+.breakdown-row.total {
+  font-weight: 600;
+  color: #333;
+  background-color: white;
+  padding: 8px 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+}
+
+.breakdown-row.net-salary {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10b981;
+  padding: 12px 8px;
+  background-color: white;
+  border-radius: 4px;
+}

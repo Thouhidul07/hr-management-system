@@ -44,6 +44,11 @@ export const authAPI = {
   updateProfile: (userData) => api.put('/auth/profile', userData),
 };
 
+// Departments API
+export const departmentsAPI = {
+  getAll: () => api.get('/departments'),
+};
+
 // Employees API
 export const employeesAPI = {
   getAll: (params = {}) => api.get('/employees', { params }),
@@ -114,13 +119,14 @@ export const hasRole = (requiredRole) => {
   
   // Role hierarchy: Admin > HR > Manager > Employee
   const roleHierarchy = {
-    'Admin': 4,
+    'ADMIN': 4,
     'HR': 3,
-    'Manager': 2,
-    'Employee': 1
+    'MANAGER': 2,
+    'EMPLOYEE': 1
   };
-  
-  return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
+
+  const normalizeRole = (role) => String(role || '').trim().toUpperCase();
+  return (roleHierarchy[normalizeRole(user.role)] || 0) >= (roleHierarchy[normalizeRole(requiredRole)] || 0);
 };
 
 export default api;

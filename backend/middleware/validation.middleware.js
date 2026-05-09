@@ -19,7 +19,8 @@ const validateRegister = [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
-  body('role').isIn(['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']).withMessage('Invalid role'),
+  // Make role optional on register; treat empty string or null as missing
+  body('role').optional({ nullable: true, checkFalsy: true }).isIn(['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']).withMessage('Invalid role'),
   validateRequest
 ];
 

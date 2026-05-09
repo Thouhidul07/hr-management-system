@@ -1,14 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../components/Card';
+import { FaCalendarAlt, FaClock, FaUser, FaClipboard } from 'react-icons/fa';
+import KPICard from '../components/KPICard';
+import ChartComponent from '../components/Chart';
+import PageCard from '../components/PageCard';
+import DataTable from '../components/DataTable';
+import Badge from '../components/Badge';
+import Card from '../components/Card';
 import { attendanceAPI } from '../services/api';
 import '../styles/Attendance.css';
 
 const Attendance = () => {
-  const [attendanceRecords, setAttendanceRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [attendanceData, setAttendanceData] = useState([
+    { id: 1, name: 'John Smith', email: 'john@company.com', checkIn: '09:00 AM', checkOut: '05:45 PM', workHours: '8h 45m', breakDuration: '1h', status: 'PRESENT' },
+    { id: 2, name: 'Sarah Connor', email: 'sarah@company.com', checkIn: '09:15 AM', checkOut: '05:30 PM', workHours: '8h 15m', breakDuration: '1h', status: 'PRESENT' },
+    { id: 3, name: 'Mike Johnson', email: 'mike@company.com', checkIn: '10:05 AM', checkOut: '06:00 PM', workHours: '7h 55m', breakDuration: '1h', status: 'LATE' },
+    { id: 4, name: 'Emma Davis', email: 'emma@company.com', checkIn: 'N/A', checkOut: 'N/A', workHours: '0h', breakDuration: '0h', status: 'ON_LEAVE' },
+    { id: 5, name: 'David Wilson', email: 'david@company.com', checkIn: 'N/A', checkOut: 'N/A', workHours: '0h', breakDuration: '0h', status: 'ABSENT' },
+  ]);
+
+  const [weeklyTrend, setWeeklyTrend] = useState([
+    { day: 'Mon', present: 1150, late: 25, absent: 12, leave: 38 },
+    { day: 'Tue', present: 1155, late: 20, absent: 10, leave: 38 },
+    { day: 'Wed', present: 1148, late: 28, absent: 14, leave: 38 },
+    { day: 'Thu', present: 1160, late: 18, absent: 8, leave: 38 },
+    { day: 'Fri', present: 1156, late: 32, absent: 8, leave: 38 },
+  ]);
+
+  // UI / local state for demo mode
+  const [attendanceRecords, setAttendanceRecords] = useState(attendanceData);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showClockInModal, setShowClockInModal] = useState(false);
   const [showClockOutModal, setShowClockOutModal] = useState(false);
   const [clockInData, setClockInData] = useState({
@@ -24,27 +47,33 @@ const Attendance = () => {
     status: 'Present',
   });
 
-  useEffect(() => {
-    fetchAttendanceRecords();
-  }, [currentPage]);
-
+  // Fetch attendance records (demo fallback to local data)
   const fetchAttendanceRecords = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await attendanceAPI.getAll({
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-      });
-      
-      setAttendanceRecords(response.data.attendance || []);
-      setTotalPages(response.data.totalPages || 1);
-    } catch (error) {
-      console.error('Error fetching attendance records:', error);
+      // try backend API first
+      if (attendanceAPI && attendanceAPI.getAll) {
+        const res = await attendanceAPI.getAll({ page: currentPage, q: searchTerm });
+        // expect res.data to be array
+        setAttendanceRecords(res.data || attendanceData);
+        setTotalPages(1);
+      } else {
+        // simulate network delay for demo
+        await new Promise((r) => setTimeout(r, 200));
+        setAttendanceRecords(attendanceData);
+        setTotalPages(1);
+      }
+    } catch (err) {
+      setAttendanceRecords(attendanceData);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAttendanceRecords();
+  }, [currentPage, searchTerm]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -119,10 +148,14 @@ const Attendance = () => {
     );
   };
 
-  const filteredRecords = attendanceRecords.filter(record =>
-    record.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRecords = attendanceRecords.filter((record) => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (record.name || '').toLowerCase().includes(q) ||
+      (record.email || '').toLowerCase().includes(q)
+    );
+  });
 
   if (loading) {
     return (
