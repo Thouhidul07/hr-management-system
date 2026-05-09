@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { prisma } = require('../config/db');
+const { query } = require('../config/db');
 const { generateToken } = require('../config/jwt');
 
 const hashPassword = async (password) => {
@@ -10,115 +10,174 @@ const comparePassword = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
+const mapUserRow = (row) => {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    email: row.email,
+    passwordHash: row.passwordHash,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    role: row.role,
+    departmentId: row.departmentId,
+    position: row.position,
+    hireDate: row.hireDate,
+    status: row.status,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    department: row.departmentId ? {
+      id: row.departmentId,
+      name: row.departmentName,
+      description: row.departmentDescription,
+    } : null,
+    employee: row.employeeId ? {
+      id: row.employeeDbId,
+      employeeId: row.employeeId,
+      reportingManagerId: row.reportingManagerId,
+      jobTitle: row.jobTitle,
+      salary: row.salary,
+    } : null,
+  };
+};
+
+const getUserByEmail = async (email) => {
+  const rows = await query(
+    `SELECT
+      u.*,
+      d.name AS departmentName,
+      d.description AS departmentDescription,
+      e.id AS employeeDbId,
+      e.employeeId,
+      e.reportingManagerId,
+      e.jobTitle,
+      e.salary
+    FROM users u
+    LEFT JOIN departments d ON d.id = u.departmentId
+    LEFT JOIN employees e ON e.userId = u.id
+    WHERE u.email = ?
+    LIMIT 1`,
+    [email]
+  );
+
+  return mapUserRow(rows[0]);
+};
+
+const getUserById = async (id) => {
+  const rows = await query(
+    `SELECT
+      u.*,
+      d.name AS departmentName,
+      d.description AS departmentDescription,
+      e.id AS employeeDbId,
+      e.employeeId,
+      e.reportingManagerId,
+      e.jobTitle,
+      e.salary
+    FROM users u
+    LEFT JOIN departments d ON d.id = u.departmentId
+    LEFT JOIN employees e ON e.userId = u.id
+    WHERE u.id = ?
+    LIMIT 1`,
+    [id]
+  );
+
+  return mapUserRow(rows[0]);
+};
+
 const register = async (userData) => {
   const { email, password, firstName, lastName, role, departmentId, position, hireDate } = userData;
-  
-  // Check if user already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email }
-  });
-  
+
+  const existingUser = await getUserByEmail(email);
+
   if (existingUser) {
     throw new Error('User already exists with this email');
   }
-  
-  // Hash password
+
   const passwordHash = await hashPassword(password);
-  
-  // Create user
-  const user = await prisma.user.create({
-    data: {
+
+  const insertResult = await query(
+    `INSERT INTO users (email, passwordHash, firstName, lastName, role, departmentId, position, hireDate)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
       email,
       passwordHash,
       firstName,
       lastName,
       role,
-      departmentId: departmentId ? parseInt(departmentId) : null,
-      position,
-      hireDate: hireDate ? new Date(hireDate) : null
-    },
-    include: {
-      department: true
-    }
-  });
-  
-  // Create employee record if role is not ADMIN
+      departmentId ? parseInt(departmentId, 10) : null,
+      position || null,
+      hireDate ? new Date(hireDate) : null,
+    ]
+  );
+
+  const userId = insertResult.insertId;
+
   if (role !== 'ADMIN') {
     const employeeId = `EMP${Date.now()}`;
-    
-    await prisma.employee.create({
-      data: {
-        userId: user.id,
-        employeeId,
-        reportingManagerId: null // Will be set later
-      }
-    });
+
+    await query(
+      `INSERT INTO employees (userId, employeeId, reportingManagerId, jobTitle)
+       VALUES (?, ?, ?, ?)`,
+      [userId, employeeId, null, position || null]
+    );
   }
-  
-  // Generate token
+
+  const user = await getUserById(userId);
   const token = generateToken({ id: user.id, email: user.email, role: user.role });
-  
+
   return { user, token };
 };
 
 const login = async (email, password) => {
-  // Find user
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: {
-      department: true
-    }
-  });
-  
+  const user = await getUserByEmail(email);
+
   if (!user) {
     throw new Error('Invalid credentials');
   }
-  
-  // Check password
+
   const isPasswordValid = await comparePassword(password, user.passwordHash);
-  
+
   if (!isPasswordValid) {
     throw new Error('Invalid credentials');
   }
-  
-  // Generate token
+
   const token = generateToken({ id: user.id, email: user.email, role: user.role });
-  
+
   return { user, token };
 };
 
 const getProfile = async (userId) => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      department: true,
-      employee: true
-    }
-  });
-  
+  const user = await getUserById(userId);
+
   if (!user) {
     throw new Error('User not found');
   }
-  
+
   return user;
 };
 
 const updateProfile = async (userId, updateData) => {
   const { firstName, lastName, position, departmentId } = updateData;
-  
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: {
-      firstName,
-      lastName,
-      position,
-      departmentId: departmentId ? parseInt(departmentId) : null
-    },
-    include: {
-      department: true
-    }
-  });
-  
+
+  await query(
+    `UPDATE users
+     SET firstName = COALESCE(?, firstName),
+         lastName = COALESCE(?, lastName),
+         position = COALESCE(?, position),
+         departmentId = COALESCE(?, departmentId)
+     WHERE id = ?`,
+    [
+      firstName || null,
+      lastName || null,
+      position || null,
+      departmentId ? parseInt(departmentId, 10) : null,
+      userId,
+    ]
+  );
+
+  const user = await getUserById(userId);
+
   return user;
 };
 

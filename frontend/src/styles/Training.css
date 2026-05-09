@@ -1,0 +1,43 @@
+/* Training Page Styles */
+.training-page {
+  padding: 30px;
+  background-color: #f5f7fa;
+}
+
+.training-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.training-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.training-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.training-header h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.training-content {
+  font-size: 13px;
+}
+
+.due-date {
+  color: #999;
+  margin: 8px 0 0 0;
+}

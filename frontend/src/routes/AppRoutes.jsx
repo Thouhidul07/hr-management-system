@@ -9,6 +9,11 @@ import Employees from '../pages/Employees';
 import Attendance from '../pages/Attendance';
 import Onboarding from '../pages/Onboarding';
 import Leave from '../pages/Leave';
+import Training from '../pages/Training';
+import Payroll from '../pages/Payroll';
+import Expense from '../pages/Expense';
+import Performance from '../pages/Performance';
+import Roles from '../pages/Roles';
 import '../styles/App.css';
 
 // Protected Route Component
@@ -130,6 +135,46 @@ const AppRoutes = () => {
               <ProtectedRoute requiredRole="HR">
                 <Layout>
                   <Leave />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/training" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Training />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/payroll" element={
+              <ProtectedRoute requiredRole="HR">
+                <Layout>
+                  <Payroll />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/expense" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Expense />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/performance" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Performance />
+                </Layout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/roles" element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <Layout>
+                  <Roles />
                 </Layout>
               </ProtectedRoute>
             } />

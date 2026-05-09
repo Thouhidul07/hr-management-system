@@ -114,13 +114,14 @@ export const hasRole = (requiredRole) => {
   
   // Role hierarchy: Admin > HR > Manager > Employee
   const roleHierarchy = {
-    'Admin': 4,
+    'ADMIN': 4,
     'HR': 3,
-    'Manager': 2,
-    'Employee': 1
+    'MANAGER': 2,
+    'EMPLOYEE': 1
   };
-  
-  return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
+
+  const normalizeRole = (role) => String(role || '').trim().toUpperCase();
+  return (roleHierarchy[normalizeRole(user.role)] || 0) >= (roleHierarchy[normalizeRole(requiredRole)] || 0);
 };
 
 export default api;

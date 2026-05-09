@@ -10,7 +10,7 @@ const onboardingRoutes = require('./routes/onboarding.routes');
 const attendanceRoutes = require('./routes/attendance.routes');
 
 // Import database connection
-const { testConnection } = require('./config/db');
+const { initDatabase } = require('./config/db');
 
 // Load environment variables
 dotenv.config();
@@ -71,8 +71,7 @@ app.use('*', (req, res) => {
 app.use((error, req, res, next) => {
   console.error('Error:', error);
   
-  // Prisma errors
-  if (error.code === 'P2002') {
+  if (error.code === 'ER_DUP_ENTRY') {
     return res.status(400).json({
       error: 'Duplicate entry',
       message: 'A record with this value already exists'
@@ -89,8 +88,8 @@ app.use((error, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    // Test database connection
-    await testConnection();
+    // Initialize database schema and seed data
+    await initDatabase();
     
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

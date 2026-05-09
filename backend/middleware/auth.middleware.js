@@ -1,5 +1,5 @@
 const { verifyToken } = require('../config/jwt');
-const { prisma } = require('../config/db');
+const { query } = require('../config/db');
 
 const authenticate = async (req, res, next) => {
   try {
@@ -10,10 +10,35 @@ const authenticate = async (req, res, next) => {
     }
 
     const decoded = verifyToken(token);
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      include: { department: true }
-    });
+
+    const rows = await query(
+      `SELECT u.*, d.name AS departmentName, d.description AS departmentDescription
+       FROM users u
+       LEFT JOIN departments d ON d.id = u.departmentId
+       WHERE u.id = ?
+       LIMIT 1`,
+      [decoded.id]
+    );
+
+    const row = rows[0];
+    const user = row ? {
+      id: row.id,
+      email: row.email,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      role: row.role,
+      departmentId: row.departmentId,
+      position: row.position,
+      hireDate: row.hireDate,
+      status: row.status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      department: row.departmentId ? {
+        id: row.departmentId,
+        name: row.departmentName,
+        description: row.departmentDescription,
+      } : null,
+    } : null;
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid token.' });
