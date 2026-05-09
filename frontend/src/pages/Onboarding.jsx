@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../components/Card';
+import Card from '../components/Card';
 import { onboardingAPI } from '../services/api';
 import '../styles/Onboarding.css';
 
@@ -46,7 +46,7 @@ const Onboarding = () => {
   const fetchOffboardingProcesses = async () => {
     try {
       const response = await onboardingAPI.getOffboarding();
-      setOffboardingProcesses(response.data.offboarding || []);
+      setOffboardingProcesses(response.data.processes || []);
     } catch (error) {
       console.error('Error fetching offboarding processes:', error);
     }
@@ -176,7 +176,6 @@ const Onboarding = () => {
       'In Progress': 'bg-info',
       'Completed': 'bg-success',
       'Active': 'bg-success',
-      'Completed': 'bg-success',
     };
     
     return (

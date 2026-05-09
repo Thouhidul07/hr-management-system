@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../components/Card';
+import Card from '../components/Card';
 import { attendanceAPI } from '../services/api';
 import '../styles/Attendance.css';
 
@@ -37,7 +37,7 @@ const Attendance = () => {
         search: searchTerm,
       });
       
-      setAttendanceRecords(response.data.attendance || []);
+      setAttendanceRecords(response.data.records || []);
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error('Error fetching attendance records:', error);

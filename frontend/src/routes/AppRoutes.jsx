@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -72,16 +72,15 @@ const LoginPage = () => {
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <Suspense fallback={
-          <div className="loading-container">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
+    <AuthProvider>
+      <Suspense fallback={
+        <div className="loading-container">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
           </div>
-        }>
-          <Routes>
+        </div>
+      }>
+        <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             
@@ -148,7 +147,6 @@ const AppRoutes = () => {
           </Routes>
         </Suspense>
       </AuthProvider>
-    </Router>
   );
 };
 

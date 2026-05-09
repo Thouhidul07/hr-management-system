@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file
 
 generator client {
   provider = "prisma-client-js"
@@ -87,273 +86,419 @@ enum PeerReviewStatus {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id           Int    @id @default(autoincrement())
+  email        String @unique
   passwordHash String
-  firstName   String
-  lastName    String
-  role        Role     @default(EMPLOYEE)
-  department  Department? @relation(fields: [departmentId], references: [id])
+  firstName    String
+  lastName     String
+  role         Role   @default(EMPLOYEE)
+
   departmentId Int?
-  position    String?
-  hireDate    DateTime?
-  status      Status   @default(ACTIVE)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  position     String?
+  hireDate     DateTime?
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  employee     Employee?       @relation(fields: [id], references: [userId])
-  assessments  Assessment[]
-  peerReviews  PeerReview[]   @relation("PeerReviewsReviewer")
-  revieweeReviews PeerReview[] @relation("PeerReviewsReviewee")
-  expenses     Expense[]
-  leaveRequests LeaveRequest[]
-  trainingEnrollments TrainingEnrollment[]
-  
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  employee Employee?
+
+  assessments Assessment[]
+
+  peerReviews PeerReview[] @relation("PeerReviewsReviewer")
+
+  onboardingTasks OnboardingTask[]
+
+  managedDepartments Department[] @relation("DepartmentManager")
+
+  managedEmployees Employee[] @relation("EmployeeManager")
+
+  approvedExpenses Expense[] @relation("ExpenseApprover")
+
+  approvedLeaves LeaveRequest[] @relation("LeaveApprover")
+
   @@map("users")
 }
 
 model Department {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String?
-  manager     User?    @relation("DepartmentManager")
-  managerId   Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  managerId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
+  manager User? @relation("DepartmentManager", fields: [managerId], references: [id])
+
   users User[]
-  
+
   @@map("departments")
 }
 
 model Employee {
-  id                 Int      @id @default(autoincrement())
-  userId             Int      @unique
-  employeeId         String   @unique
-  reportingManagerId  Int?
-  jobTitle           String?
-  salary             Decimal?
-  bankAccountNumber  String?
-  taxId              String?
+  id Int @id @default(autoincrement())
+
+  userId Int @unique
+
+  employeeId String @unique
+
+  reportingManagerId Int?
+
+  jobTitle String?
+
+  salary Decimal? @db.Decimal(10, 2)
+
+  bankAccountNumber String?
+
+  taxId String?
+
   emergencyContactName String?
+
   emergencyContactPhone String?
+
   emergencyContactRelation String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user              User             @relation(fields: [userId], references: [id])
-  reportingManager  User?            @relation("EmployeeManager", fields: [reportingManagerId], references: [id])
-  attendances       Attendance[]
-  leaveRequests     LeaveRequest[]
+  user User @relation(fields: [userId], references: [id])
+
+  reportingManager User? @relation("EmployeeManager", fields: [reportingManagerId], references: [id])
+
+  attendances Attendance[]
+
+  leaveRequests LeaveRequest[]
+
   trainingEnrollments TrainingEnrollment[]
-  payrollRecords    Payroll[]
-  expenses          Expense[]
-  assessments       Assessment[]
-  peerReviews       PeerReview[]     @relation("PeerReviewsReviewee")
-  
+
+  payrollRecords Payroll[]
+
+  expenses Expense[]
+
+  assessments Assessment[]
+
+  peerReviews PeerReview[] @relation("PeerReviewsReviewee")
+
+  offboardingProcesses OffboardingProcess[]
+
   @@map("employees")
 }
 
 model OnboardingTask {
-  id          Int      @id @default(autoincrement())
-  title       String
+  id Int @id @default(autoincrement())
+
+  title String
+
   description String
-  dueDate     DateTime
-  status      String   @default("pending")
-  assignedTo  Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  dueDate DateTime
+
+  status String @default("pending")
+
+  assignedTo Int?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   assignedUser User? @relation(fields: [assignedTo], references: [id])
-  
+
   @@map("onboarding_tasks")
 }
 
 model OffboardingProcess {
-  id          Int      @id @default(autoincrement())
-  employeeId  Int
-  lastDay     DateTime
-  reason      String
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  lastDay DateTime
+
+  reason String
+
+  status String @default("active")
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  
+
   @@map("offboarding_processes")
 }
 
 model Attendance {
-  id            Int            @id @default(autoincrement())
-  employeeId    Int            @unique
-  date          DateTime        @unique
-  checkIn       DateTime?
-  checkOut      DateTime?
-  breakDuration Int            @default(0) // in minutes
-  status        AttendanceStatus @default(PRESENT)
-  notes         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  date DateTime
+
+  checkIn DateTime?
+
+  checkOut DateTime?
+
+  breakDuration Int @default(0)
+
+  status AttendanceStatus @default(PRESENT)
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  
+
+  @@unique([employeeId, date])
   @@map("attendance")
 }
 
 model LeaveRequest {
-  id          Int         @id @default(autoincrement())
-  employeeId  Int
-  leaveType   LeaveType
-  startDate   DateTime
-  endDate     DateTime
-  totalDays   Decimal     @db.Decimal(5, 2)
-  reason      String?
-  status      LeaveStatus @default(PENDING)
-  approvedBy  Int?
-  approvedAt  DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  leaveType LeaveType
+
+  startDate DateTime
+
+  endDate DateTime
+
+  totalDays Decimal @db.Decimal(5, 2)
+
+  reason String?
+
+  status LeaveStatus @default(PENDING)
+
+  approvedBy Int?
+
+  approvedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  approver User?    @relation(fields: [approvedBy], references: [id])
-  
+
+  approver User? @relation("LeaveApprover", fields: [approvedBy], references: [id])
+
   @@map("leave_requests")
 }
 
 model Training {
-  id              Int            @id @default(autoincrement())
-  title           String
-  description     String
-  startDate       DateTime
-  endDate         DateTime
-  location        String?
-  trainer         String?
+  id Int @id @default(autoincrement())
+
+  title String
+
+  description String
+
+  startDate DateTime
+
+  endDate DateTime
+
+  location String?
+
+  trainer String?
+
   maxParticipants Int?
-  status          TrainingStatus @default(SCHEDULED)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+
+  status TrainingStatus @default(SCHEDULED)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   enrollments TrainingEnrollment[]
-  
+
   @@map("trainings")
 }
 
 model TrainingEnrollment {
-  id             Int             @id @default(autoincrement())
-  trainingId     Int
-  employeeId     Int
-  enrollmentDate DateTime        @default(now())
+  id Int @id @default(autoincrement())
+
+  trainingId Int
+
+  employeeId Int
+
+  enrollmentDate DateTime @default(now())
+
   completionDate DateTime?
-  status         EnrollmentStatus @default(ENROLLED)
-  score          Decimal?        @db.Decimal(5, 2)
-  feedback       String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+
+  status EnrollmentStatus @default(ENROLLED)
+
+  score Decimal? @db.Decimal(5, 2)
+
+  feedback String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   training Training @relation(fields: [trainingId], references: [id])
+
   employee Employee @relation(fields: [employeeId], references: [id])
-  
+
   @@unique([trainingId, employeeId])
   @@map("training_enrollments")
 }
 
 model Payroll {
-  id                Int            @id @default(autoincrement())
-  employeeId        Int
-  payPeriodStart   DateTime
-  payPeriodEnd     DateTime
-  basicSalary       Decimal        @db.Decimal(10, 2)
-  allowances        Decimal        @db.Decimal(10, 2) @default(0)
-  deductions        Decimal        @db.Decimal(10, 2) @default(0)
-  overtimePay       Decimal        @db.Decimal(10, 2) @default(0)
-  bonus            Decimal        @db.Decimal(10, 2) @default(0)
-  tax              Decimal        @db.Decimal(10, 2) @default(0)
-  netSalary        Decimal        @db.Decimal(10, 2)
-  paymentDate       DateTime?
-  status            PayrollStatus  @default(PENDING)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  payPeriodStart DateTime
+
+  payPeriodEnd DateTime
+
+  basicSalary Decimal @db.Decimal(10, 2)
+
+  allowances Decimal @default(0) @db.Decimal(10, 2)
+
+  deductions Decimal @default(0) @db.Decimal(10, 2)
+
+  overtimePay Decimal @default(0) @db.Decimal(10, 2)
+
+  bonus Decimal @default(0) @db.Decimal(10, 2)
+
+  tax Decimal @default(0) @db.Decimal(10, 2)
+
+  netSalary Decimal @db.Decimal(10, 2)
+
+  paymentDate DateTime?
+
+  status PayrollStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  
+
   @@unique([employeeId, payPeriodStart, payPeriodEnd])
   @@map("payroll")
 }
 
 model Expense {
-  id             Int           @id @default(autoincrement())
-  employeeId     Int
-  expenseType    String
-  amount         Decimal       @db.Decimal(10, 2)
-  description    String?
-  expenseDate    DateTime
-  receiptUrl     String?
-  status         ExpenseStatus @default(PENDING)
-  approvedBy     Int?
-  approvedAt     DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  expenseType String
+
+  amount Decimal @db.Decimal(10, 2)
+
+  description String?
+
+  expenseDate DateTime
+
+  receiptUrl String?
+
+  status ExpenseStatus @default(PENDING)
+
+  approvedBy Int?
+
+  approvedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  approver User?    @relation(fields: [approvedBy], references: [id])
-  
+
+  approver User? @relation("ExpenseApprover", fields: [approvedBy], references: [id])
+
   @@map("expenses")
 }
 
 model Assessment {
-  id                    Int             @id @default(autoincrement())
-  employeeId            Int
-  assessorId            Int
+  id Int @id @default(autoincrement())
+
+  employeeId Int
+
+  assessorId Int
+
   assessmentPeriodStart DateTime
-  assessmentPeriodEnd   DateTime
-  overallRating         Decimal?        @db.Decimal(3, 2)
-  goalsAchievement      String?
-  strengths             String?
-  areasForImprovement   String?
-  comments              String?
-  status                AssessmentStatus @default(DRAFT)
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
+
+  assessmentPeriodEnd DateTime
+
+  overallRating Decimal? @db.Decimal(3, 2)
+
+  goalsAchievement String?
+
+  strengths String?
+
+  areasForImprovement String?
+
+  comments String?
+
+  status AssessmentStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
   employee Employee @relation(fields: [employeeId], references: [id])
-  assessor User    @relation(fields: [assessorId], references: [id])
-  
+
+  assessor User @relation(fields: [assessorId], references: [id])
+
   @@map("assessments")
 }
 
 model PeerReview {
-  id                    Int             @id @default(autoincrement())
-  reviewerId            Int
-  revieweeId            Int
-  reviewPeriodStart     DateTime
-  reviewPeriodEnd       DateTime
-  teamworkRating        Decimal?        @db.Decimal(3, 2)
-  communicationRating   Decimal?        @db.Decimal(3, 2)
-  problemSolvingRating  Decimal?        @db.Decimal(3, 2)
-  leadershipRating      Decimal?        @db.Decimal(3, 2)
-  adaptabilityRating    Decimal?        @db.Decimal(3, 2)
-  comments              String?
-  isAnonymous           Boolean         @default(false)
-  status                PeerReviewStatus @default(DRAFT)
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
+  id Int @id @default(autoincrement())
+
+  reviewerId Int
+
+  revieweeId Int
+
+  reviewPeriodStart DateTime
+
+  reviewPeriodEnd DateTime
+
+  teamworkRating Decimal? @db.Decimal(3, 2)
+
+  communicationRating Decimal? @db.Decimal(3, 2)
+
+  problemSolvingRating Decimal? @db.Decimal(3, 2)
+
+  leadershipRating Decimal? @db.Decimal(3, 2)
+
+  adaptabilityRating Decimal? @db.Decimal(3, 2)
+
+  comments String?
+
+  isAnonymous Boolean @default(false)
+
+  status PeerReviewStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 
   // Relations
-  reviewer User    @relation("PeerReviewsReviewer", fields: [reviewerId], references: [id])
+  reviewer User @relation("PeerReviewsReviewer", fields: [reviewerId], references: [id])
+
   reviewee Employee @relation("PeerReviewsReviewee", fields: [revieweeId], references: [id])
-  
+
   @@unique([reviewerId, revieweeId, reviewPeriodStart, reviewPeriodEnd])
   @@map("peer_reviews")
 }

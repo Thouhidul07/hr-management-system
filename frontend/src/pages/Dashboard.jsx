@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../components/Card';
+import Card from '../components/Card';
 import { employeesAPI, attendanceAPI } from '../services/api';
 import '../styles/Dashboard.css';
 
@@ -23,11 +23,12 @@ const Dashboard = () => {
         // Fetch attendance stats for today
         const today = new Date().toISOString().split('T')[0];
         const attendanceResponse = await attendanceAPI.getAll({
-          date: today,
+          startDate: today,
+          endDate: today,
           limit: 1000,
         });
         
-        const attendanceRecords = attendanceResponse.data;
+        const attendanceRecords = attendanceResponse.data.records || [];
         const presentCount = attendanceRecords.filter(
           record => record.status === 'Present'
         ).length;
