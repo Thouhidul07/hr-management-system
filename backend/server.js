@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth.routes');
 const employeeRoutes = require('./routes/employee.routes');
 const onboardingRoutes = require('./routes/onboarding.routes');
 const attendanceRoutes = require('./routes/attendance.routes');
+const docsRoutes = require('./routes/docs.routes');
 
 // Import database connection
 const { testConnection } = require('./config/db');
@@ -20,7 +21,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+  origin: true,
   credentials: true
 }));
 
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/docs', docsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -54,7 +56,8 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       employees: '/api/employees',
       onboarding: '/api/onboarding',
-      attendance: '/api/attendance'
+      attendance: '/api/attendance',
+      docs: '/api/docs'
     }
   });
 });
