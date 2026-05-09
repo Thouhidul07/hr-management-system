@@ -94,7 +94,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ef4444;
+  background: #EC4176;
   border: 2px solid #fff;
 }
 
@@ -109,12 +109,12 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-strong), #6d5efc);
+  background: linear-gradient(135deg, #543884, #9A77CF);
   color: #fff;
   display: grid;
   place-items: center;
   font-weight: 700;
-  box-shadow: 0 10px 22px rgba(91, 92, 226, 0.22);
+  box-shadow: 0 10px 22px rgba(84, 56, 132, 0.22);
 }
 
 .navbar-user .user-info {

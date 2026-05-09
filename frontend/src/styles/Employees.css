@@ -30,7 +30,7 @@
     min-height: 44px;
     border-radius: 14px;
     padding-inline: 18px;
-    box-shadow: 0 16px 28px rgba(91, 92, 226, 0.2);
+    box-shadow: 0 16px 28px rgba(84, 56, 132, 0.2);
   }
 
   .employees-toolbar-card .card-body {
@@ -131,11 +131,11 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, var(--accent-strong), #6d5efc);
+    background: linear-gradient(135deg, #543884, #9A77CF);
     color: #fff;
     font-weight: 700;
     font-size: 0.8rem;
-    box-shadow: 0 10px 20px rgba(91, 92, 226, 0.2);
+    box-shadow: 0 10px 20px rgba(84, 56, 132, 0.2);
   }
 
   .employee-name {

@@ -9,23 +9,23 @@
 }
 
 .stat-card.bg-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #9A77CF 0%, #543884 100%);
 }
 
 .stat-card.bg-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #FFA45E 0%, #FF8C3E 100%);
 }
 
 .stat-card.bg-warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #EC4176 0%, #D0305C 100%);
 }
 
 .stat-card.bg-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #EC4176 0%, #D0305C 100%);
 }
 
 .stat-card.bg-info {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  background: linear-gradient(135deg, #9A77CF 0%, #543884 100%);
 }
 
 .stat-icon {

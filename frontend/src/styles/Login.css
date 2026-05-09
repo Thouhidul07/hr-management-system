@@ -4,8 +4,8 @@
   place-items: center;
   padding: 32px;
   background:
-    radial-gradient(circle at top left, rgba(91, 92, 226, 0.15), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.1), transparent 28%),
+    radial-gradient(circle at top left, rgba(84, 56, 132, 0.15), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(154, 119, 207, 0.1), transparent 28%),
     #f3f5fb;
 }
 
@@ -30,7 +30,7 @@
   overflow: hidden;
   color: #fff;
   background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(91, 92, 226, 0.88)),
+    linear-gradient(145deg, #262254, rgba(84, 56, 132, 0.95)),
     url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480"%3E%3Cpath fill="%23ffffff" fill-opacity="0.06" d="M0 0h48v48H0zM96 0h48v48H96zM192 0h48v48h-48zM288 0h48v48h-48zM384 0h48v48h-48zM48 48h48v48H48zM144 48h48v48h-48zM240 48h48v48h-48zM336 48h48v48h-48zM432 48h48v48h-48zM0 96h48v48H0zM96 96h48v48H96zM192 96h48v48h-48zM288 96h48v48h-48zM384 96h48v48h-48zM48 144h48v48H48zM144 144h48v48h-48zM240 144h48v48h-48zM336 144h48v48h-48zM432 144h48v48h-48zM0 192h48v48H0zM96 192h48v48H96zM192 192h48v48h-48zM288 192h48v48h-48zM384 192h48v48h-48zM48 240h48v48H48zM144 240h48v48h-48zM240 240h48v48h-48zM336 240h48v48h-48zM432 240h48v48h-48zM0 288h48v48H0zM96 288h48v48H96zM192 288h48v48h-48zM288 288h48v48h-48zM384 288h48v48h-48zM48 336h48v48H48zM144 336h48v48h-48zM240 336h48v48h-48zM336 336h48v48h-48zM432 336h48v48h-48zM0 384h48v48H0zM96 384h48v48H96zM192 384h48v48h-48zM288 384h48v48h-48zM384 384h48v48h-48z"/%3E');
 }
 
@@ -128,16 +128,16 @@
 
 .login-form .form-control:focus {
   outline: none;
-  border-color: rgba(91, 92, 226, 0.55);
-  box-shadow: 0 0 0 4px rgba(91, 92, 226, 0.12);
+  border-color: rgba(84, 56, 132, 0.55);
+  box-shadow: 0 0 0 4px rgba(84, 56, 132, 0.12);
 }
 
 .login-form .btn-primary {
   min-height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent-strong), #6d5efc);
+  background: linear-gradient(135deg, #543884, #9A77CF);
   border: 0;
-  box-shadow: 0 16px 28px rgba(91, 92, 226, 0.24);
+  box-shadow: 0 16px 28px rgba(84, 56, 132, 0.24);
 }
 
 .login-toggle-btn {

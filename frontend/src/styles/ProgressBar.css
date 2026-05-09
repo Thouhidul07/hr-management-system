@@ -25,11 +25,11 @@
   transition: width 0.3s ease;
 }
 
-.progress-primary { background: linear-gradient(90deg, #5b5ce2, #7c3aed); }
-.progress-success { background: linear-gradient(90deg, #22c55e, #16a34a); }
-.progress-warning { background: linear-gradient(90deg, #fb923c, #ea580c); }
-.progress-danger { background: linear-gradient(90deg, #f87171, #dc2626); }
-.progress-info { background: linear-gradient(90deg, #38bdf8, #0284c7); }
+.progress-primary { background: linear-gradient(90deg, #9A77CF, #543884); }
+.progress-success { background: linear-gradient(90deg, #FFA45E, #FF8C3E); }
+.progress-warning { background: linear-gradient(90deg, #EC4176, #D0305C); }
+.progress-danger { background: linear-gradient(90deg, #EC4176, #D0305C); }
+.progress-info { background: linear-gradient(90deg, #9A77CF, #543884); }
 
 .progress-value {
   font-size: 0.78rem;
