@@ -102,13 +102,14 @@ model User {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  employee     Employee?       @relation(fields: [id], references: [userId])
-  assessments  Assessment[]
-  peerReviews  PeerReview[]   @relation("PeerReviewsReviewer")
-  revieweeReviews PeerReview[] @relation("PeerReviewsReviewee")
-  expenses     Expense[]
-  leaveRequests LeaveRequest[]
-  trainingEnrollments TrainingEnrollment[]
+  employee Employee? @relation("UserEmployee")
+  managedDepartments Department[] @relation("DepartmentManager")
+  managedEmployees Employee[] @relation("EmployeeManager")
+  onboardingTasks OnboardingTask[] @relation("OnboardingAssigned")
+  assessments Assessment[] @relation("AssessmentAssessor")
+  peerReviews PeerReview[] @relation("PeerReviewsReviewer")
+  leaveApprovals LeaveRequest[] @relation("LeaveApprover")
+  expenseApprovals Expense[] @relation("ExpenseApprover")
   
   @@map("users")
 }
@@ -117,7 +118,7 @@ model Department {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  manager     User?    @relation("DepartmentManager")
+  manager     User?    @relation("DepartmentManager", fields: [managerId], references: [id])
   managerId   Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -144,15 +145,16 @@ model Employee {
   updatedAt          DateTime @updatedAt
 
   // Relations
-  user              User             @relation(fields: [userId], references: [id])
-  reportingManager  User?            @relation("EmployeeManager", fields: [reportingManagerId], references: [id])
-  attendances       Attendance[]
-  leaveRequests     LeaveRequest[]
-  trainingEnrollments TrainingEnrollment[]
-  payrollRecords    Payroll[]
-  expenses          Expense[]
-  assessments       Assessment[]
-  peerReviews       PeerReview[]     @relation("PeerReviewsReviewee")
+  user User @relation("UserEmployee", fields: [userId], references: [id])
+  reportingManager User? @relation("EmployeeManager", fields: [reportingManagerId], references: [id])
+  attendances Attendance[] @relation("AttendanceEmployee")
+  offboardingProcesses OffboardingProcess[] @relation("OffboardingEmployee")
+  leaveRequests LeaveRequest[] @relation("LeaveEmployee")
+  trainingEnrollments TrainingEnrollment[] @relation("TrainingEmployee")
+  payrollRecords Payroll[] @relation("PayrollEmployee")
+  expenses Expense[] @relation("ExpenseEmployee")
+  assessments Assessment[] @relation("AssessmentEmployee")
+  peerReviews PeerReview[] @relation("PeerReviewsReviewee")
   
   @@map("employees")
 }
@@ -168,7 +170,7 @@ model OnboardingTask {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  assignedUser User? @relation(fields: [assignedTo], references: [id])
+  assignedUser User? @relation("OnboardingAssigned", fields: [assignedTo], references: [id])
   
   @@map("onboarding_tasks")
 }
@@ -183,15 +185,15 @@ model OffboardingProcess {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee Employee @relation("OffboardingEmployee", fields: [employeeId], references: [id])
   
   @@map("offboarding_processes")
 }
 
 model Attendance {
   id            Int            @id @default(autoincrement())
-  employeeId    Int            @unique
-  date          DateTime        @unique
+  employeeId    Int
+  date          DateTime
   checkIn       DateTime?
   checkOut      DateTime?
   breakDuration Int            @default(0) // in minutes
@@ -201,8 +203,9 @@ model Attendance {
   updatedAt     DateTime        @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee Employee @relation("AttendanceEmployee", fields: [employeeId], references: [id])
   
+  @@unique([employeeId, date])
   @@map("attendance")
 }
 
@@ -221,8 +224,8 @@ model LeaveRequest {
   updatedAt   DateTime    @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
-  approver User?    @relation(fields: [approvedBy], references: [id])
+  employee Employee @relation("LeaveEmployee", fields: [employeeId], references: [id])
+  approver User? @relation("LeaveApprover", fields: [approvedBy], references: [id])
   
   @@map("leave_requests")
 }
@@ -260,7 +263,7 @@ model TrainingEnrollment {
 
   // Relations
   training Training @relation(fields: [trainingId], references: [id])
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee Employee @relation("TrainingEmployee", fields: [employeeId], references: [id])
   
   @@unique([trainingId, employeeId])
   @@map("training_enrollments")
@@ -284,7 +287,7 @@ model Payroll {
   updatedAt         DateTime       @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee Employee @relation("PayrollEmployee", fields: [employeeId], references: [id])
   
   @@unique([employeeId, payPeriodStart, payPeriodEnd])
   @@map("payroll")
@@ -305,8 +308,8 @@ model Expense {
   updatedAt      DateTime      @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
-  approver User?    @relation(fields: [approvedBy], references: [id])
+  employee Employee @relation("ExpenseEmployee", fields: [employeeId], references: [id])
+  approver User? @relation("ExpenseApprover", fields: [approvedBy], references: [id])
   
   @@map("expenses")
 }
@@ -327,8 +330,8 @@ model Assessment {
   updatedAt             DateTime        @updatedAt
 
   // Relations
-  employee Employee @relation(fields: [employeeId], references: [id])
-  assessor User    @relation(fields: [assessorId], references: [id])
+  employee Employee @relation("AssessmentEmployee", fields: [employeeId], references: [id])
+  assessor User @relation("AssessmentAssessor", fields: [assessorId], references: [id])
   
   @@map("assessments")
 }
@@ -351,7 +354,7 @@ model PeerReview {
   updatedAt             DateTime        @updatedAt
 
   // Relations
-  reviewer User    @relation("PeerReviewsReviewer", fields: [reviewerId], references: [id])
+  reviewer User @relation("PeerReviewsReviewer", fields: [reviewerId], references: [id])
   reviewee Employee @relation("PeerReviewsReviewee", fields: [revieweeId], references: [id])
   
   @@unique([reviewerId, revieweeId, reviewPeriodStart, reviewPeriodEnd])

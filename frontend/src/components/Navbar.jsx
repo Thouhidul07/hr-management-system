@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../styles/Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '../components/Card';
+import Card from '../components/Card';
 import { employeesAPI } from '../services/api';
 import '../styles/Employees.css';
 
