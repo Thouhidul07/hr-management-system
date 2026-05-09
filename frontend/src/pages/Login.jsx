@@ -8,9 +8,14 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    role: 'EMPLOYEE',
   });
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState(null);
   const { login, register, error } = useAuth();
   const navigate = useNavigate();
 
@@ -23,6 +28,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError(null);
     setLoading(true);
 
     try {
@@ -32,6 +38,17 @@ const Login = () => {
           navigate('/dashboard');
         }
       } else {
+        // Client-side validation for registration
+        if (formData.password.length < 6) {
+          setLocalError('Password must be at least 6 characters');
+          setLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setLocalError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
         const result = await register(formData);
         if (result.success) {
           navigate('/dashboard');
@@ -46,7 +63,8 @@ const Login = () => {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ email: '', password: '' });
+    setFormData({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', role: 'EMPLOYEE' });
+    setLocalError(null);
   };
 
   return (
@@ -83,22 +101,70 @@ const Login = () => {
               />
             </div>
             {!isLogin && (
-              <div className="mb-3">
-                <label htmlFor="confirmPassword" className="form-label">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword || ''}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              <>
+                <div className="mb-3">
+                  <label htmlFor="firstName" className="form-label">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="lastName" className="form-label">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="role" className="form-label">
+                    Role
+                  </label>
+                  <select
+                    className="form-control"
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword || ''}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </>
             )}
-            {error && <div className="alert alert-danger">{error}</div>}
+            {(localError || error) && <div className="alert alert-danger">{localError || error}</div>}
             <button type="submit" className="btn btn-primary w-100" disabled={loading}>
               {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
             </button>
