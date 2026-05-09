@@ -34,6 +34,13 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  const getErrorMessage = (err, fallback) => {
+    return err.response?.data?.message
+      || err.response?.data?.error
+      || err.response?.data?.errors?.[0]?.msg
+      || fallback;
+  };
+
   const login = async (credentials) => {
     try {
       setError(null);
@@ -46,8 +53,9 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-      return { success: false, error: err.response?.data?.message || 'Login failed' };
+      const message = getErrorMessage(err, 'Login failed');
+      setError(message);
+      return { success: false, error: message };
     }
   };
 
@@ -63,8 +71,9 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-      return { success: false, error: err.response?.data?.message || 'Registration failed' };
+      const message = getErrorMessage(err, 'Registration failed');
+      setError(message);
+      return { success: false, error: message };
     }
   };
 
@@ -72,6 +81,10 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(null);
     setUser(null);
     setUserState(null);
+    setError(null);
+  };
+
+  const clearError = () => {
     setError(null);
   };
 
@@ -98,6 +111,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    clearError,
     updateProfile,
     isAuthenticated,
     hasRole,

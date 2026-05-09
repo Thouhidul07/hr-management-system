@@ -8,10 +8,15 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    role: 'EMPLOYEE',
   });
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const { login, register, error } = useAuth();
+  const [formError, setFormError] = useState(null);
+  const { login, register, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,16 +28,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError(null);
     setLoading(true);
 
     try {
+      if (!isLogin && formData.password !== formData.confirmPassword) {
+        setFormError('Passwords do not match');
+        return;
+      }
+
+      const authData = {
+        email: formData.email,
+        password: formData.password,
+        ...(isLogin ? {} : {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          role: formData.role,
+        }),
+      };
+
       if (isLogin) {
-        const result = await login(formData);
+        const result = await login(authData);
         if (result.success) {
           navigate('/dashboard');
         }
       } else {
-        const result = await register(formData);
+        const result = await register(authData);
         if (result.success) {
           navigate('/dashboard');
         }
@@ -46,7 +67,16 @@ const Login = () => {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ email: '', password: '' });
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      firstName: '',
+      lastName: '',
+      role: 'EMPLOYEE',
+    });
+    setFormError(null);
+    clearError();
   };
 
   return (
@@ -83,22 +113,74 @@ const Login = () => {
               />
             </div>
             {!isLogin && (
-              <div className="mb-3">
-                <label htmlFor="confirmPassword" className="form-label">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword || ''}
-                  onChange={handleChange}
-                  required
-                />
+              <>
+                <div className="mb-3">
+                  <label htmlFor="firstName" className="form-label">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="lastName" className="form-label">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="role" className="form-label">
+                    Role
+                  </label>
+                  <select
+                    className="form-select"
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </>
+            )}
+            {(formError || error) && (
+              <div className="alert alert-danger">
+                {formError || error}
               </div>
             )}
-            {error && <div className="alert alert-danger">{error}</div>}
             <button type="submit" className="btn btn-primary w-100" disabled={loading}>
               {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
             </button>
