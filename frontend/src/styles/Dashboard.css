@@ -1,18 +1,19 @@
 /* Dashboard Styles */
 .dashboard {
-  padding: 20px;
+  padding: 24px 0;
 }
 
 .dashboard-title {
   font-size: 2rem;
-  margin-bottom: 30px;
-  color: #333;
+  margin-bottom: 28px;
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
   margin-bottom: 30px;
 }
 
@@ -20,55 +21,54 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 }
 
 .card-icon {
   font-size: 2.5rem;
   margin-right: 15px;
+  color: var(--crimson);
 }
 
 .card-value {
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .dashboard-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
 }
 
 .activity-placeholder,
 .tasks-placeholder {
-  padding: 40px;
+  padding: 32px;
   text-align: center;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  color: #6c757d;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
 }
 
-/* Loading */
 .dashboard-loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 400px;
+  min-height: 400px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .dashboard {
-    padding: 10px;
+    padding: 18px 0;
   }
-  
+
   .dashboard-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
-  
-  .dashboard-cards {
-    grid-template-columns: 1fr;
-  }
-  
+
+  .dashboard-cards,
   .dashboard-charts {
     grid-template-columns: 1fr;
   }

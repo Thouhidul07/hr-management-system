@@ -55,7 +55,7 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>HRMS</h2>
+        <h2>HRSpace</h2>
         <span>Human Resource Management</span>
       </div>
       

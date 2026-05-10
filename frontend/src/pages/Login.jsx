@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Card from '../components/Card';
+import {
+  FaUser,
+  FaLock,
+  FaEnvelope,
+  FaUserTie,
+} from 'react-icons/fa';
 import '../styles/Login.css';
 
 const Login = () => {
@@ -13,9 +18,11 @@ const Login = () => {
     lastName: '',
     role: 'EMPLOYEE',
   });
+
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
+
   const { login, register, error } = useAuth();
   const navigate = useNavigate();
 
@@ -34,22 +41,25 @@ const Login = () => {
     try {
       if (isLogin) {
         const result = await login(formData);
+
         if (result.success) {
           navigate('/dashboard');
         }
       } else {
-        // Client-side validation for registration
         if (formData.password.length < 6) {
           setLocalError('Password must be at least 6 characters');
           setLoading(false);
           return;
         }
+
         if (formData.password !== formData.confirmPassword) {
           setLocalError('Passwords do not match');
           setLoading(false);
           return;
         }
+
         const result = await register(formData);
+
         if (result.success) {
           navigate('/dashboard');
         }
@@ -63,80 +73,98 @@ const Login = () => {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', role: 'EMPLOYEE' });
+
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      firstName: '',
+      lastName: '',
+      role: 'EMPLOYEE',
+    });
+
     setLocalError(null);
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <Card title={isLogin ? 'Login' : 'Register'}>
+    <div className="login-page">
+      <div className="login-box">
+        {/* Logo */}
+        <div className="logo-section">
+          <h1 className="logo-text">
+            <span>HR</span>Space
+          </h1>
+          <div className="logo-line"></div>
+        </div>
+
+        {/* Card */}
+        <div className="glass-card">
+          <h2 className="login-title">
+            {isLogin ? 'Login to Your Account' : 'Create Your Account'}
+          </h2>
+
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
+            {/* Email */}
+            <div className="input-group-custom">
+              <FaEnvelope className="input-icon" />
+
               <input
                 type="email"
-                className="form-control"
-                id="email"
                 name="email"
+                placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
+
+            {/* Password */}
+            <div className="input-group-custom">
+              <FaLock className="input-icon" />
+
               <input
                 type="password"
-                className="form-control"
-                id="password"
                 name="password"
+                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 required
               />
             </div>
+
+            {/* Register Fields */}
             {!isLogin && (
               <>
-                <div className="mb-3">
-                  <label htmlFor="firstName" className="form-label">
-                    First Name
-                  </label>
+                <div className="input-group-custom">
+                  <FaUser className="input-icon" />
+
                   <input
                     type="text"
-                    className="form-control"
-                    id="firstName"
                     name="firstName"
+                    placeholder="First Name"
                     value={formData.firstName}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="lastName" className="form-label">
-                    Last Name
-                  </label>
+
+                <div className="input-group-custom">
+                  <FaUser className="input-icon" />
+
                   <input
                     type="text"
-                    className="form-control"
-                    id="lastName"
                     name="lastName"
+                    placeholder="Last Name"
                     value={formData.lastName}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="role" className="form-label">
-                    Role
-                  </label>
+
+                <div className="input-group-custom">
+                  <FaUserTie className="input-icon" />
+
                   <select
-                    className="form-control"
-                    id="role"
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
@@ -148,33 +176,74 @@ const Login = () => {
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="confirmPassword" className="form-label">
-                    Confirm Password
-                  </label>
+
+                <div className="input-group-custom">
+                  <FaLock className="input-icon" />
+
                   <input
                     type="password"
-                    className="form-control"
-                    id="confirmPassword"
                     name="confirmPassword"
-                    value={formData.confirmPassword || ''}
+                    placeholder="Confirm Password"
+                    value={formData.confirmPassword}
                     onChange={handleChange}
                     required
                   />
                 </div>
               </>
             )}
-            {(localError || error) && <div className="alert alert-danger">{localError || error}</div>}
-            <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-              {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
+
+            {/* Error */}
+            {(localError || error) && (
+              <div className="error-box">
+                {localError || error}
+              </div>
+            )}
+
+            {/* Remember + Forgot */}
+            {isLogin && (
+              <div className="login-options">
+                <label className="remember-me">
+                  <input type="checkbox" />
+                  Remember Me
+                </label>
+
+                <button
+                  type="button"
+                  className="forgot-password"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            )}
+
+            {/* Button */}
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={loading}
+            >
+              {loading
+                ? 'Loading...'
+                : isLogin
+                ? 'Login'
+                : 'Register'}
             </button>
           </form>
-          <div className="text-center mt-3">
-            <button onClick={toggleMode} className="btn btn-link">
-              {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
+
+          {/* Toggle */}
+          <div className="bottom-text">
+            {isLogin
+              ? "Don't have an account?"
+              : 'Already have an account?'}
+
+            <button
+              onClick={toggleMode}
+              className="switch-btn"
+            >
+              {isLogin ? 'Register Here' : 'Login Here'}
             </button>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
