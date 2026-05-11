@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background-color: #F9FAFB;
+    color: #262254;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button, input, select, textarea { font: inherit; }
+}
+
+@layer components {
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(84,56,132,0.25); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(84,56,132,0.45); }
+}
